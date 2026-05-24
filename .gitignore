@@ -1,0 +1,96 @@
+# --- learning notes are personal, never pushed ---
+learning/
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyright/
+.coverage
+htmlcov/
+coverage.xml
+.tox/
+.nox/
+
+# --- uv ---
+.venv/
+venv/
+env/
+
+# --- env / secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+.aws/
+
+# --- data and checkpoints (managed by DVC, not git) ---
+data/raw/
+data/processed/
+data/checkpoints/
+*.parquet
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.onnx
+*.ckpt
+*.h5
+mlruns/
+.dvc/cache
+.dvc/tmp
+
+# --- docker / runtime ---
+*.pid
+*.log
+*.sock
+
+# --- frontend / node ---
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.vercel
+
+# --- jupyter ---
+.ipynb_checkpoints/
+
+# --- macOS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# --- editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.cursor/
+
+# --- mlflow / experiment artifacts ---
+mlflow.db
+artifacts/
+
+# --- misc ---
+.cache/
+tmp/
+*.bak
