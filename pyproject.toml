@@ -44,7 +44,8 @@ ignore = ["E501"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["tests", "services/*/tests", "shared/tests"]
+testpaths = ["tests", "services/ingest/tests", "services/detect/tests", "services/agents/tests", "services/rl/tests", "services/replay/tests", "services/gateway/tests", "shared/tests"]
+addopts = "--import-mode=importlib"
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]

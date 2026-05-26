@@ -8,7 +8,7 @@ import uuid
 import pytest
 
 from shared import Frame, RAW_FRAMES, consumer, producer, send_model
-from tests.conftest import requires_kafka
+from shared.testing import requires_kafka
 
 
 @pytest.mark.asyncio

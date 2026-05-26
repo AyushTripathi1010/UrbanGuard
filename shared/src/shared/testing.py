@@ -1,4 +1,4 @@
-"""Shared pytest fixtures and skip markers for integration tests."""
+"""Shared pytest skip markers — used by every service's integration tests."""
 
 from __future__ import annotations
 
