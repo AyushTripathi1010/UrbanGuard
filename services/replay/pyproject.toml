@@ -10,6 +10,7 @@ dependencies = [
     "pandas>=2.2",
     "pyarrow>=18.0",
     "structlog>=24.4",
+    "cramjam>=2.8",
 ]
 
 [build-system]

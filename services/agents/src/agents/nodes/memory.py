@@ -5,8 +5,9 @@ from __future__ import annotations
 import uuid
 
 import structlog
-from sqlalchemy import JSON, Column, DateTime, String, Float, Boolean, MetaData, Table
+from sqlalchemy import JSON, Boolean, Column, DateTime, Float, MetaData, String, Table
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import insert
 
 from shared.settings import settings
@@ -41,10 +42,23 @@ _engine: AsyncEngine | None = None
 
 
 def _get_engine() -> AsyncEngine:
+    # NullPool: every call opens + closes a connection. Safe across event loops
+    # (important for pytest, which creates a fresh loop per async test) and the
+    # per-alert throughput here is far below the cost ceiling that would justify
+    # connection pooling. If you ever flip back to a pooled engine, be sure the
+    # engine is loop-scoped, not module-scoped.
     global _engine
     if _engine is None:
-        _engine = create_async_engine(settings.postgres_dsn, pool_pre_ping=True)
+        _engine = create_async_engine(settings.postgres_dsn, poolclass=NullPool)
     return _engine
+
+
+async def dispose_engine() -> None:
+    """Drop the cached engine. Used by tests; harmless in production."""
+    global _engine
+    if _engine is not None:
+        await _engine.dispose()
+        _engine = None
 
 
 async def init_schema() -> None:
