@@ -19,6 +19,12 @@ members = [
 
 [tool.uv.sources]
 urbanguard-shared = { workspace = true }
+urbanguard-agents = { workspace = true }
+urbanguard-ingest = { workspace = true }
+urbanguard-detect = { workspace = true }
+urbanguard-rl = { workspace = true }
+urbanguard-replay = { workspace = true }
+urbanguard-gateway = { workspace = true }
 
 [dependency-groups]
 dev = [
