@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
-
 from shared.testing import requires_postgres
 
 

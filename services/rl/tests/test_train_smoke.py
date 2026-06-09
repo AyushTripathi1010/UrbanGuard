@@ -6,11 +6,13 @@ import os
 from pathlib import Path
 
 import pytest
-
 from rl.train import train
 
 
-@pytest.mark.skipif(os.environ.get("URBANGUARD_RL_SMOKE") != "1", reason="set URBANGUARD_RL_SMOKE=1 to run ~30s PPO smoke")
+@pytest.mark.skipif(
+    os.environ.get("URBANGUARD_RL_SMOKE") != "1",
+    reason="set URBANGUARD_RL_SMOKE=1 to run ~30s PPO smoke",
+)
 def test_ppo_smoke_runs_and_writes_checkpoint(tmp_path: Path) -> None:
     save_path = tmp_path / "ppo_smoke.zip"
     out = train(total_steps=2048, save_path=save_path, seed=7)

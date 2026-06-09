@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import pytest
-
-from shared import Alert, SeverityTier
-from shared.testing import requires_postgres
-
 from agents.graph import build_graph
 from agents.nodes.memory import init_schema
 from agents.state import IncidentState
+from shared.testing import requires_postgres
+
+from shared import Alert, SeverityTier
 
 
 def _make_alert() -> Alert:
@@ -35,13 +34,15 @@ def test_graph_compiles_with_four_nodes() -> None:
 @requires_postgres
 async def test_graph_runs_end_to_end_against_real_postgres(monkeypatch) -> None:
     # Mock the LLM call so the test doesn't need API keys.
-    async def fake_generate_json(prompt, schema, providers=None):  # noqa: ARG001
-        return schema.model_validate({"severity": "high", "rationale": "ok", "requires_dispatch": True})
+    async def fake_generate_json(prompt, schema, providers=None):
+        return schema.model_validate(
+            {"severity": "high", "rationale": "ok", "requires_dispatch": True}
+        )
 
     monkeypatch.setattr("agents.nodes.triage.generate_json", fake_generate_json)
 
     # OSRM isn't reachable in dev — force the synthetic fallback.
-    async def osrm_off(src, dst):  # noqa: ARG001
+    async def osrm_off(src, dst):
         return None
 
     monkeypatch.setattr("agents.nodes.route._osrm_route", osrm_off)

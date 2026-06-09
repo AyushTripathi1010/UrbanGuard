@@ -9,13 +9,12 @@ from pathlib import Path
 
 import structlog
 from aiokafka import AIOKafkaProducer
-
-from shared import Frame, GeoPoint
 from shared.kafka_io import send_model
 from shared.settings import settings
 from shared.topics import RAW_FRAMES
 
 from ingest.video_loader import DecodedFrame, iter_clip_frames
+from shared import Frame, GeoPoint
 
 log = structlog.get_logger("ingest.camera")
 
@@ -51,7 +50,9 @@ class CameraProducer:
     async def start(self) -> None:
         if self._decode_task is not None:
             return
-        self._decode_task = asyncio.create_task(self._decode_loop(), name=f"decode-{self.spec.camera_id}")
+        self._decode_task = asyncio.create_task(
+            self._decode_loop(), name=f"decode-{self.spec.camera_id}"
+        )
         self._send_task = asyncio.create_task(self._send_loop(), name=f"send-{self.spec.camera_id}")
         log.info("camera.started", camera_id=self.spec.camera_id, zone=self.spec.zone_id)
 

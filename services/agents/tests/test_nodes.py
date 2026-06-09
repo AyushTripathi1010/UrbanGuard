@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import pytest
-
-from shared import Alert, SeverityTier
-
 from agents import llm_provider as lp
 from agents.nodes.notify import notify_node
 from agents.nodes.route import route_node
 from agents.nodes.triage import triage_node
 from agents.state import IncidentState, RouteDecision, TriageDecision
+
+from shared import Alert, SeverityTier
 
 
 def _make_alert(severity: float = 0.7) -> Alert:
@@ -25,8 +24,10 @@ def _make_alert(severity: float = 0.7) -> Alert:
 
 @pytest.mark.asyncio
 async def test_triage_node_uses_llm_and_writes_decision(monkeypatch) -> None:
-    async def fake_generate_json(prompt, schema, providers=None):  # noqa: ARG001
-        return schema.model_validate({"severity": "high", "rationale": "fits", "requires_dispatch": True})
+    async def fake_generate_json(prompt, schema, providers=None):
+        return schema.model_validate(
+            {"severity": "high", "rationale": "fits", "requires_dispatch": True}
+        )
 
     monkeypatch.setattr("agents.nodes.triage.generate_json", fake_generate_json)
     state = IncidentState(alert=_make_alert())
@@ -38,7 +39,7 @@ async def test_triage_node_uses_llm_and_writes_decision(monkeypatch) -> None:
 
 @pytest.mark.asyncio
 async def test_triage_node_recovers_when_llm_unavailable(monkeypatch) -> None:
-    async def boom(prompt, schema, providers=None):  # noqa: ARG001
+    async def boom(prompt, schema, providers=None):
         raise lp.LLMUnavailable("no provider")
 
     monkeypatch.setattr("agents.nodes.triage.generate_json", boom)
@@ -62,7 +63,7 @@ async def test_route_node_skips_when_no_dispatch() -> None:
 @pytest.mark.asyncio
 async def test_route_node_picks_hospital_for_critical(monkeypatch) -> None:
     # Force OSRM to be unreachable so we exercise the synthetic fallback.
-    async def osrm_off(src, dst):  # noqa: ARG001
+    async def osrm_off(src, dst):
         return None
 
     monkeypatch.setattr("agents.nodes.route._osrm_route", osrm_off)
@@ -93,7 +94,9 @@ async def test_notify_node_records_log_channel_on_dispatch() -> None:
     state = IncidentState(
         alert=_make_alert(),
         triage=TriageDecision(severity=SeverityTier.high, requires_dispatch=True),
-        route=RouteDecision(target_type="hospital", target_name="X", distance_meters=1200, eta_seconds=180),
+        route=RouteDecision(
+            target_type="hospital", target_name="X", distance_meters=1200, eta_seconds=180
+        ),
     )
     out = await notify_node(state)
     assert out.notify is not None

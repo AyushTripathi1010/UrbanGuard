@@ -6,9 +6,9 @@ import asyncio
 import uuid
 
 import pytest
-
-from shared import Frame, RAW_FRAMES, consumer, producer, send_model
 from shared.testing import requires_kafka
+
+from shared import RAW_FRAMES, Frame, consumer, producer, send_model
 
 
 @pytest.mark.asyncio

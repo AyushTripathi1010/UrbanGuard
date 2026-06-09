@@ -14,12 +14,11 @@ from pathlib import Path
 from aiokafka import AIOKafkaProducer
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
-from shared import GeoPoint
 from shared.observability import install_prometheus
 from shared.settings import settings
 
 from ingest.camera import CameraProducer, CameraSpec
+from shared import GeoPoint
 
 
 class StartCameraRequest(BaseModel):

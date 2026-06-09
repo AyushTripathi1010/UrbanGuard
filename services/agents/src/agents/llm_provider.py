@@ -15,6 +15,8 @@ from typing import TypeVar
 
 import structlog
 from pydantic import BaseModel, ValidationError
+from shared.observability import trace
+from shared.settings import settings
 from tenacity import (
     AsyncRetrying,
     RetryError,
@@ -22,9 +24,6 @@ from tenacity import (
     stop_after_attempt,
     wait_exponential,
 )
-
-from shared.observability import trace
-from shared.settings import settings
 
 log = structlog.get_logger("agents.llm_provider")
 
@@ -115,7 +114,9 @@ def build_chain() -> list[LLMProvider]:
     return chain
 
 
-async def generate_json(prompt: str, schema: type[T], providers: list[LLMProvider] | None = None) -> T:
+async def generate_json(
+    prompt: str, schema: type[T], providers: list[LLMProvider] | None = None
+) -> T:
     providers = providers or build_chain()
     last_exc: Exception | None = None
     with trace(
@@ -136,11 +137,14 @@ async def generate_json(prompt: str, schema: type[T], providers: list[LLMProvide
                         log.info("llm.ok", provider=provider.name, schema=schema.__name__)
                         if t is not None:
                             try:
-                                t.update(output=out.model_dump(mode="json"), metadata={"provider": provider.name})
-                            except Exception:  # noqa: BLE001
+                                t.update(
+                                    output=out.model_dump(mode="json"),
+                                    metadata={"provider": provider.name},
+                                )
+                            except Exception:
                                 pass
                         return out
-            except (RetryError, Exception) as exc:  # noqa: BLE001
+            except (RetryError, Exception) as exc:
                 log.warning("llm.failed", provider=provider.name, error=str(exc))
                 last_exc = exc
                 continue

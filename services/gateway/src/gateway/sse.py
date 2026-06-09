@@ -9,7 +9,6 @@ from contextlib import asynccontextmanager
 import structlog
 from aiokafka import AIOKafkaConsumer
 from aiokafka.coordinator.assignors.sticky.sticky_assignor import StickyPartitionAssignor
-
 from shared.settings import settings
 
 log = structlog.get_logger("gateway.sse")

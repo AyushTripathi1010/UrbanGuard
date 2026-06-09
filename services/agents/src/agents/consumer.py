@@ -5,13 +5,12 @@ from __future__ import annotations
 import structlog
 from aiokafka import AIOKafkaConsumer
 from aiokafka.coordinator.assignors.sticky.sticky_assignor import StickyPartitionAssignor
-
-from shared import ALERTS, Alert
 from shared.settings import settings
 
 from agents.graph import build_graph
 from agents.nodes.memory import init_schema
 from agents.state import IncidentState
+from shared import ALERTS, Alert
 
 log = structlog.get_logger("agents.consumer")
 
@@ -35,7 +34,7 @@ async def run() -> None:
         async for record in consumer:
             try:
                 alert = Alert.model_validate_json(record.value)
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 log.warning("alert.parse_failed", error=str(exc))
                 await consumer.commit()
                 continue
@@ -49,7 +48,7 @@ async def run() -> None:
                     severity=(final.get("triage") or {}).get("severity"),
                     incident=final.get("persisted_incident_id"),
                 )
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 log.error("graph.failed", alert=alert.alert_id, error=str(exc))
             finally:
                 await consumer.commit()

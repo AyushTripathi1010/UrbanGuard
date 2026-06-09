@@ -8,12 +8,10 @@ from pathlib import Path
 import numpy as np
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from shared.observability import install_prometheus
 from stable_baselines3 import PPO
 
-from rl.env import EnvConfig, ZoneSamplingEnv
-from shared.observability import install_prometheus
-from shared.settings import settings
-
+from rl.env import EnvConfig
 
 _DEFAULT_CHECKPOINT = Path("data/checkpoints/ppo_zone_policy.zip")
 

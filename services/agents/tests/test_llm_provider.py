@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import pytest
-from pydantic import BaseModel
-
 from agents.llm_provider import (
     LLMProvider,
     LLMUnavailable,
     StubProvider,
     generate_json,
 )
+from pydantic import BaseModel
 
 
 class _DemoSchema(BaseModel):
@@ -19,7 +18,7 @@ class _DemoSchema(BaseModel):
 class _AlwaysFails(LLMProvider):
     name = "always_fails"
 
-    async def generate_json(self, prompt: str, schema):  # noqa: ARG002
+    async def generate_json(self, prompt: str, schema):
         raise RuntimeError("boom")
 
 

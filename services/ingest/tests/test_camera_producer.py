@@ -6,13 +6,12 @@ from pathlib import Path
 
 import pytest
 from aiokafka import AIOKafkaProducer
-
-from shared import Frame, RAW_FRAMES, consumer
+from ingest.camera import CameraProducer, CameraSpec
+from ingest.video_loader import synthesize_clip
 from shared.settings import settings
 from shared.testing import requires_kafka
 
-from ingest.camera import CameraProducer, CameraSpec
-from ingest.video_loader import synthesize_clip
+from shared import RAW_FRAMES, Frame, consumer
 
 
 @pytest.fixture

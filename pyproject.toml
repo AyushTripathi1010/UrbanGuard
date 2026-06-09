@@ -43,7 +43,11 @@ extend-exclude = ["notebooks", "data", "learning"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
-ignore = ["E501"]
+# E501: line length (we use format, not lint, for line wrapping)
+# UP042: str + Enum is fine pre-StrEnum migration; we'll move when 3.11 is min
+# UP046/UP047: PEP 695 type-param syntax — fine but not required for our generics
+# SIM105: try/except/pass reads as clearly as contextlib.suppress; either is fine
+ignore = ["E501", "UP042", "UP046", "UP047", "SIM105"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["B011"]

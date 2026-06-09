@@ -13,9 +13,9 @@ from pathlib import Path
 import structlog
 from aiokafka import AIOKafkaConsumer
 from aiokafka.coordinator.assignors.sticky.sticky_assignor import StickyPartitionAssignor
+from shared.settings import settings
 
 from shared import RL_FEEDBACK, RLFeedback
-from shared.settings import settings
 
 log = structlog.get_logger("rl.feedback")
 
@@ -39,7 +39,7 @@ async def run() -> None:
         async for record in consumer:
             try:
                 fb = RLFeedback.model_validate_json(record.value)
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 log.warning("rl.feedback.parse_failed", error=str(exc))
                 await consumer.commit()
                 continue

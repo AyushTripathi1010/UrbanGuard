@@ -11,11 +11,10 @@ import math
 
 import httpx
 import structlog
-
-from shared import GeoPoint
 from shared.settings import settings
 
 from agents.state import IncidentState, RouteDecision
+from shared import GeoPoint
 
 log = structlog.get_logger("agents.route")
 
@@ -24,12 +23,12 @@ log = structlog.get_logger("agents.route")
 _DEFAULT_CITY_CENTRE = GeoPoint(lat=18.5204, lon=73.8567)
 
 _FALLBACK_REGISTRY = [
-    ("hospital", "Sahyadri Hospital Deccan",   GeoPoint(lat=18.5181, lon=73.8417)),
-    ("hospital", "Ruby Hall Clinic",            GeoPoint(lat=18.5320, lon=73.8780)),
-    ("hospital", "Jehangir Hospital",           GeoPoint(lat=18.5288, lon=73.8717)),
-    ("police",   "Deccan Police Station",       GeoPoint(lat=18.5165, lon=73.8418)),
-    ("police",   "Koregaon Park Police Station", GeoPoint(lat=18.5362, lon=73.8930)),
-    ("police",   "Shivajinagar Police Station", GeoPoint(lat=18.5293, lon=73.8439)),
+    ("hospital", "Sahyadri Hospital Deccan", GeoPoint(lat=18.5181, lon=73.8417)),
+    ("hospital", "Ruby Hall Clinic", GeoPoint(lat=18.5320, lon=73.8780)),
+    ("hospital", "Jehangir Hospital", GeoPoint(lat=18.5288, lon=73.8717)),
+    ("police", "Deccan Police Station", GeoPoint(lat=18.5165, lon=73.8418)),
+    ("police", "Koregaon Park Police Station", GeoPoint(lat=18.5362, lon=73.8930)),
+    ("police", "Shivajinagar Police Station", GeoPoint(lat=18.5293, lon=73.8439)),
 ]
 
 
@@ -63,7 +62,7 @@ async def _osrm_route(src: GeoPoint, dst: GeoPoint) -> tuple[float, int] | None:
         body = r.json()
         leg = body["routes"][0]
         return float(leg["distance"]), int(leg["duration"])
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         log.debug("osrm.unreachable", error=str(exc))
         return None
 

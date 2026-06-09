@@ -10,7 +10,6 @@ from pathlib import Path
 
 import duckdb
 import structlog
-
 from shared.settings import settings
 
 log = structlog.get_logger("replay.aggregate")
@@ -106,8 +105,8 @@ def build_zone_stats(
         """
     )
 
-    rows = con.execute(
-        f"SELECT COUNT(*) FROM read_parquet('{output_path.as_posix()}')"
-    ).fetchone()[0]
+    rows = con.execute(f"SELECT COUNT(*) FROM read_parquet('{output_path.as_posix()}')").fetchone()[
+        0
+    ]
     log.info("zone_stats.written", path=str(output_path), rows=rows)
     return output_path

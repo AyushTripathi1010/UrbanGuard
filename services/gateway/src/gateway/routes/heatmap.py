@@ -2,19 +2,18 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-
-from fastapi import APIRouter
-from sqlalchemy import func, select
+from datetime import UTC, datetime, timedelta
 
 from agents.nodes.memory import _get_engine, incidents
+from fastapi import APIRouter
+from sqlalchemy import func, select
 
 router = APIRouter()
 
 
 @router.get("/heatmap")
 async def heatmap(hours: int = 24) -> list[dict]:
-    since = datetime.now(timezone.utc) - timedelta(hours=hours)
+    since = datetime.now(UTC) - timedelta(hours=hours)
     eng = _get_engine()
     async with eng.connect() as conn:
         result = await conn.execute(

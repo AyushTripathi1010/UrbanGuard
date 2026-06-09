@@ -38,14 +38,16 @@ def _client() -> Any | None:
             host=settings.langfuse_host,
         )
         return _langfuse_client
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         log.warning("langfuse.disabled", error=str(exc))
         _langfuse_disabled = True
         return None
 
 
 @contextmanager
-def trace(name: str, *, input: dict[str, Any] | None = None, metadata: dict[str, Any] | None = None):
+def trace(
+    name: str, *, input: dict[str, Any] | None = None, metadata: dict[str, Any] | None = None
+):
     """Yield a trace handle. If Langfuse isn't configured, yields None.
 
     Use as::
@@ -61,7 +63,7 @@ def trace(name: str, *, input: dict[str, Any] | None = None, metadata: dict[str,
         return
     try:
         t = client.trace(name=name, input=input, metadata=metadata or {})
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         log.warning("langfuse.trace_create_failed", error=str(exc))
         yield None
         return
@@ -70,7 +72,7 @@ def trace(name: str, *, input: dict[str, Any] | None = None, metadata: dict[str,
     finally:
         try:
             client.flush()
-        except Exception:  # noqa: BLE001
+        except Exception:
             pass
 
 
@@ -80,5 +82,5 @@ def install_prometheus(app, endpoint: str = "/metrics") -> None:
         from prometheus_fastapi_instrumentator import Instrumentator
 
         Instrumentator().instrument(app).expose(app, endpoint=endpoint)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         log.warning("prometheus.skipped", error=str(exc))

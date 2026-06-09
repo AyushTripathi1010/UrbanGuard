@@ -47,7 +47,7 @@ async def iter_clip_frames(
     src_fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    skip = max(1, int(round(src_fps / max(1, target_fps))))
+    skip = max(1, round(src_fps / max(1, target_fps)))
     idx = 0
     try:
         while True:

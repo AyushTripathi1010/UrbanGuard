@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Description: |
+  UrbanGuard nightly RL training trigger.
+  Scheduled by EventBridge; the Lambda invokes a containerized rl.train run
+  whose checkpoint is uploaded to Cloudflare R2 (or S3) and registered with
+  DagsHub MLflow.
+
+Parameters:
+  R2BucketName:
+    Type: String
+    Default: urbanguard-checkpoints
+  ImageUri:
+    Type: String
+    Description: ECR image URI for the rl service container
+
+Resources:
+  RlTrainNightly:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: !Ref ImageUri
+      Timeout: 900
+      MemorySize: 2048
+      Environment:
+        Variables:
+          R2_BUCKET: !Ref R2BucketName
+      Events:
+        Nightly:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0 3 * * ? *) # 03:00 UTC daily
+
+Outputs:
+  RlTrainNightlyArn:
+    Description: ARN of the nightly training Lambda
+    Value: !GetAtt RlTrainNightly.Arn

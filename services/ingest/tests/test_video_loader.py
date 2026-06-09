@@ -4,7 +4,6 @@ import asyncio
 from pathlib import Path
 
 import pytest
-
 from ingest.video_loader import iter_clip_frames, synthesize_clip
 
 

@@ -17,6 +17,7 @@ log = structlog.get_logger("rl.train")
 def make_env_factory(seed: int):
     def _factory():
         return ZoneSamplingEnv(EnvConfig(seed=seed))
+
     return _factory
 
 

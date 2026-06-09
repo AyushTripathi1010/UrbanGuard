@@ -7,7 +7,6 @@ from functools import lru_cache
 from typing import TYPE_CHECKING
 
 import torch
-
 from shared.settings import settings
 
 if TYPE_CHECKING:
@@ -51,8 +50,9 @@ def load_resnet_scorer():
     pretrained backbone and warn the caller via the `is_finetuned` flag. The
     consumer can still emit alerts; severity will just be ~0.5 placeholder.
     """
-    import torch.nn as nn
     from pathlib import Path
+
+    import torch.nn as nn
     from torchvision.models import ResNet50_Weights, resnet50
 
     device = resolve_device()
@@ -76,7 +76,7 @@ def load_resnet_scorer():
     return backbone, device, is_finetuned
 
 
-def pil_to_tensor(image: "Image", device: torch.device) -> torch.Tensor:
+def pil_to_tensor(image: Image, device: torch.device) -> torch.Tensor:
     import torchvision.transforms as T
 
     transform = T.Compose(

@@ -9,6 +9,7 @@ but adds compute cost and false-alarm risk.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import ClassVar
 
 import gymnasium as gym
 import numpy as np
@@ -19,9 +20,9 @@ from gymnasium import spaces
 class EnvConfig:
     num_zones: int = 10
     hours_per_episode: int = 24
-    base_incident_rate: float = 0.4   # per zone per hour at rate-multiplier=1.0
-    detection_alpha: float = 1.2      # logit slope for detection_prob vs sampling_rate
-    false_alarm_alpha: float = 0.08   # false alarms per hour per zone per rate unit
+    base_incident_rate: float = 0.4  # per zone per hour at rate-multiplier=1.0
+    detection_alpha: float = 1.2  # logit slope for detection_prob vs sampling_rate
+    false_alarm_alpha: float = 0.08  # false alarms per hour per zone per rate unit
     early_detect_reward: float = 10.0
     false_alarm_penalty: float = -2.0
     miss_penalty: float = -5.0
@@ -39,7 +40,7 @@ class ZoneSamplingEnv(gym.Env):
     Action: rate multiplier per zone, Box([0.5]*Z, [4.0]*Z)
     """
 
-    metadata = {"render_modes": []}
+    metadata: ClassVar[dict] = {"render_modes": []}
 
     def __init__(self, config: EnvConfig | None = None) -> None:
         super().__init__()
@@ -50,8 +51,20 @@ class ZoneSamplingEnv(gym.Env):
         self.action_space = spaces.Box(low=0.5, high=4.0, shape=(Z,), dtype=np.float32)
         obs_dim = 2 * Z + 1
         self.observation_space = spaces.Box(
-            low=np.concatenate([np.zeros(Z, dtype=np.float32), np.zeros(1, dtype=np.float32), np.zeros(Z, dtype=np.float32)]),
-            high=np.concatenate([np.full(Z, 50, dtype=np.float32), np.ones(1, dtype=np.float32), np.ones(Z, dtype=np.float32)]),
+            low=np.concatenate(
+                [
+                    np.zeros(Z, dtype=np.float32),
+                    np.zeros(1, dtype=np.float32),
+                    np.zeros(Z, dtype=np.float32),
+                ]
+            ),
+            high=np.concatenate(
+                [
+                    np.full(Z, 50, dtype=np.float32),
+                    np.ones(1, dtype=np.float32),
+                    np.ones(Z, dtype=np.float32),
+                ]
+            ),
             shape=(obs_dim,),
             dtype=np.float32,
         )
@@ -68,10 +81,14 @@ class ZoneSamplingEnv(gym.Env):
         return self.cfg.base_incident_rate * (base + 0.6 * boost)
 
     def _obs(self) -> np.ndarray:
-        hour_norm = np.array([self._hour / max(1, self.cfg.hours_per_episode - 1)], dtype=np.float32)
-        return np.concatenate([self._recent.astype(np.float32), hour_norm, self._last_clip], dtype=np.float32)
+        hour_norm = np.array(
+            [self._hour / max(1, self.cfg.hours_per_episode - 1)], dtype=np.float32
+        )
+        return np.concatenate(
+            [self._recent.astype(np.float32), hour_norm, self._last_clip], dtype=np.float32
+        )
 
-    def reset(self, *, seed: int | None = None, options=None):  # noqa: ARG002
+    def reset(self, *, seed: int | None = None, options=None):
         super().reset(seed=seed)
         if seed is not None:
             self._rng = np.random.default_rng(seed)
@@ -81,7 +98,6 @@ class ZoneSamplingEnv(gym.Env):
         return self._obs(), {}
 
     def step(self, action: np.ndarray):
-        Z = self.cfg.num_zones
         action = np.clip(action, 0.5, 4.0).astype(np.float32)
 
         true_rate = self._zone_rate(self._hour)

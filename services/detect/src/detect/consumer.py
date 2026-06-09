@@ -11,13 +11,12 @@ import structlog
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from aiokafka.coordinator.assignors.sticky.sticky_assignor import StickyPartitionAssignor
 from PIL import Image
-
-from shared import ALERTS, Alert, Frame, RAW_FRAMES
 from shared.kafka_io import send_model
 from shared.settings import settings
 
 from detect.clip_classifier import classify
 from detect.resnet_scorer import score_severity
+from shared import ALERTS, RAW_FRAMES, Alert, Frame
 
 log = structlog.get_logger("detect.consumer")
 
@@ -51,7 +50,7 @@ async def run() -> None:
         async for record in consumer:
             try:
                 frame = Frame.model_validate_json(record.value)
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 log.warning("frame.parse_failed", error=str(exc), partition=record.partition)
                 await consumer.commit()
                 continue

@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
+from agents.nodes.memory import dispose_engine, init_schema
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from agents.nodes.memory import dispose_engine, init_schema
-from gateway.routes import alerts, cameras, heatmap
 from shared.observability import install_prometheus
+
+from gateway.routes import alerts, cameras, heatmap
 
 
 @asynccontextmanager
@@ -19,16 +19,14 @@ async def lifespan(_: FastAPI):
     # surface their own error per request rather than blocking app start.
     try:
         await init_schema()
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         import structlog
 
-        structlog.get_logger("gateway.lifespan").warning(
-            "schema_init_skipped", error=str(exc)
-        )
+        structlog.get_logger("gateway.lifespan").warning("schema_init_skipped", error=str(exc))
     yield
     try:
         await dispose_engine()
-    except Exception:  # noqa: BLE001
+    except Exception:
         pass
 
 

@@ -5,10 +5,9 @@ import uuid
 from pathlib import Path
 
 import duckdb
-import pytest
+from shared.testing import requires_postgres
 
 from shared import RLFeedback
-from shared.testing import requires_postgres
 
 
 def _write_feedback_fixture(path: Path, n: int = 4) -> Path:
@@ -38,6 +37,7 @@ def test_build_zone_stats_against_real_postgres(tmp_path: Path) -> None:
 
     # Insert two synthetic rows via DuckDB postgres scanner.
     from shared.settings import settings as s
+
     pg_dsn = f"postgresql://{s.postgres_user}:{s.postgres_password}@{s.postgres_host}:{s.postgres_port}/{s.postgres_db}"
     con = duckdb.connect(":memory:")
     con.execute("INSTALL postgres; LOAD postgres;")
@@ -60,12 +60,17 @@ def test_build_zone_stats_against_real_postgres(tmp_path: Path) -> None:
     out_path = tmp_path / "zone_stats.parquet"
 
     from replay.aggregate import build_zone_stats
+
     written = build_zone_stats(feedback_path=feedback, output_path=out_path, pg_dsn=pg_dsn)
     assert written.exists()
 
-    rows = duckdb.connect(":memory:").execute(
-        f"SELECT zone_id, incident_count, detected_early, misses FROM read_parquet('{written.as_posix()}') ORDER BY zone_id, hour_of_day"
-    ).fetchall()
+    rows = (
+        duckdb.connect(":memory:")
+        .execute(
+            f"SELECT zone_id, incident_count, detected_early, misses FROM read_parquet('{written.as_posix()}') ORDER BY zone_id, hour_of_day"
+        )
+        .fetchall()
+    )
     zone_ids = {r[0] for r in rows}
     assert {"z-1", "z-2"} <= zone_ids
     # cleanup so this test stays idempotent across runs

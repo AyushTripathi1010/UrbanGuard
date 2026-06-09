@@ -31,7 +31,9 @@ async def producer() -> AsyncIterator[AIOKafkaProducer]:
         await p.stop()
 
 
-async def send_model(p: AIOKafkaProducer, topic: str, msg: BaseModel, key: str | None = None) -> None:
+async def send_model(
+    p: AIOKafkaProducer, topic: str, msg: BaseModel, key: str | None = None
+) -> None:
     """Serialize a Pydantic model as JSON bytes and send."""
     payload = msg.model_dump_json().encode("utf-8")
     k = key.encode("utf-8") if key is not None else None

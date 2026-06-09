@@ -5,12 +5,11 @@ from __future__ import annotations
 import uuid
 
 import structlog
+from shared.settings import settings
 from sqlalchemy import JSON, Boolean, Column, DateTime, Float, MetaData, String, Table
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import insert
-
-from shared.settings import settings
 
 from agents.state import IncidentState
 

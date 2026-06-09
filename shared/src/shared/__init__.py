@@ -5,12 +5,12 @@ from shared.topics import ALERTS, RAW_FRAMES, RL_FEEDBACK
 
 __all__ = [
     "ALERTS",
+    "RAW_FRAMES",
+    "RL_FEEDBACK",
     "Alert",
     "Frame",
     "GeoPoint",
     "Incident",
-    "RAW_FRAMES",
-    "RL_FEEDBACK",
     "RLFeedback",
     "SeverityTier",
     "consume_model",

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import structlog
 
@@ -21,7 +21,7 @@ def _aggregate_cmd(_: argparse.Namespace) -> None:
 
 def _rewind_cmd(args: argparse.Namespace) -> None:
     if args.hours_ago is not None:
-        not_before = datetime.now(timezone.utc) - timedelta(hours=args.hours_ago)
+        not_before = datetime.now(UTC) - timedelta(hours=args.hours_ago)
     else:
         not_before = datetime.fromisoformat(args.not_before)
     new_offsets = asyncio.run(

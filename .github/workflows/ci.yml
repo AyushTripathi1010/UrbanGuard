@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "0.11.2"
+
+      - name: Setup Python
+        run: uv python install 3.12
+
+      - name: Sync workspace
+        run: uv sync --all-packages
+
+      - name: Lint
+        run: |
+          uv run ruff format --check .
+          uv run ruff check .
+
+      - name: Run tests (no docker services available in CI)
+        env:
+          # Force the live skip markers to mark all integration tests skipped
+          # since we don't bring up Kafka/Postgres in this minimal CI.
+          URBANGUARD_RUN_MODELS: "0"
+          URBANGUARD_RL_SMOKE: "0"
+        run: uv run pytest -q

@@ -5,11 +5,10 @@ debugging or for re-training the detection thresholds against past data.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 from aiokafka import AIOKafkaConsumer, TopicPartition
-
 from shared.settings import settings
 
 log = structlog.get_logger("replay.replay")
@@ -26,7 +25,7 @@ async def rewind_group(
     Returns {partition: new_offset}.
     """
     if not_before.tzinfo is None:
-        not_before = not_before.replace(tzinfo=timezone.utc)
+        not_before = not_before.replace(tzinfo=UTC)
 
     consumer = AIOKafkaConsumer(
         bootstrap_servers=settings.kafka_bootstrap_servers,
@@ -49,7 +48,9 @@ async def rewind_group(
             consumer.seek(tp, info.offset)
             new_offsets[tp.partition] = info.offset
         # Commit the seek so the consumer group sticks at this offset.
-        await consumer.commit({tp: info.offset for tp, info in offsets_for_times.items() if info is not None})
+        await consumer.commit(
+            {tp: info.offset for tp, info in offsets_for_times.items() if info is not None}
+        )
         log.info(
             "rewind.done",
             topic=topic,

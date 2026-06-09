@@ -9,7 +9,6 @@ from PIL.Image import Image
 
 from detect.model_loader import load_clip
 
-
 # Ordering matters: index 0 is the "incident" class, the rest are negatives.
 # Prompt phrasing tested against DoTA + Nexar val samples in notebook 03.
 PROMPTS: list[str] = [

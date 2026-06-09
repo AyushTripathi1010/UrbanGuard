@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import uuid
 
+from agents.nodes.memory import _get_engine, incidents
 from fastapi import APIRouter
 from sqlalchemy import select
 from sse_starlette.sse import EventSourceResponse
 
-from agents.nodes.memory import _get_engine, incidents
 from gateway.sse import stream_records
 from shared import ALERTS
 
