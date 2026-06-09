@@ -16,6 +16,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from shared import GeoPoint
+from shared.observability import install_prometheus
 from shared.settings import settings
 
 from ingest.camera import CameraProducer, CameraSpec
@@ -63,6 +64,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="urbanguard-ingest", lifespan=lifespan)
+install_prometheus(app)
 
 
 @app.get("/healthz")

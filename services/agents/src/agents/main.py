@@ -8,9 +8,12 @@ import logging
 import structlog
 from fastapi import FastAPI
 
+from shared.observability import install_prometheus
+
 from agents.consumer import run as run_consumer
 
 app = FastAPI(title="urbanguard-agents")
+install_prometheus(app)
 
 
 @app.get("/healthz")

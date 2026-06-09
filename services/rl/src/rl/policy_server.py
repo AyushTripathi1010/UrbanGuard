@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from stable_baselines3 import PPO
 
 from rl.env import EnvConfig, ZoneSamplingEnv
+from shared.observability import install_prometheus
 from shared.settings import settings
 
 
@@ -42,6 +43,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="urbanguard-rl-policy", lifespan=lifespan)
+install_prometheus(app)
 
 
 @app.get("/healthz")

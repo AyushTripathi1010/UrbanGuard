@@ -3243,16 +3243,22 @@ source = { editable = "shared" }
 dependencies = [
     { name = "aiokafka" },
     { name = "cramjam" },
+    { name = "langfuse" },
+    { name = "prometheus-fastapi-instrumentator" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "structlog" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "aiokafka", specifier = ">=0.12" },
     { name = "cramjam", specifier = ">=2.8" },
+    { name = "langfuse", specifier = ">=2.50" },
+    { name = "prometheus-fastapi-instrumentator", specifier = ">=7.0" },
     { name = "pydantic", specifier = ">=2.9" },
     { name = "pydantic-settings", specifier = ">=2.6" },
+    { name = "structlog", specifier = ">=24.4" },
 ]
 
 [[package]]

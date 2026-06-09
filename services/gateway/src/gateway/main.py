@@ -6,10 +6,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from prometheus_fastapi_instrumentator import Instrumentator
 
 from agents.nodes.memory import dispose_engine, init_schema
 from gateway.routes import alerts, cameras, heatmap
+from shared.observability import install_prometheus
 
 
 @asynccontextmanager
@@ -39,7 +39,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-Instrumentator().instrument(app).expose(app, endpoint="/metrics")
+install_prometheus(app)
 
 app.include_router(alerts.router)
 app.include_router(heatmap.router)

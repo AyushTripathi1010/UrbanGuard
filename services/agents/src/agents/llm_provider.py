@@ -23,6 +23,7 @@ from tenacity import (
     wait_exponential,
 )
 
+from shared.observability import trace
 from shared.settings import settings
 
 log = structlog.get_logger("agents.llm_provider")
@@ -117,23 +118,33 @@ def build_chain() -> list[LLMProvider]:
 async def generate_json(prompt: str, schema: type[T], providers: list[LLMProvider] | None = None) -> T:
     providers = providers or build_chain()
     last_exc: Exception | None = None
-    for provider in providers:
-        try:
-            async for attempt in AsyncRetrying(
-                stop=stop_after_attempt(3),
-                wait=wait_exponential(multiplier=0.5, min=0.5, max=4.0),
-                retry=retry_if_exception_type(Exception),
-                reraise=True,
-            ):
-                with attempt:
-                    out = await provider.generate_json(prompt, schema)
-                    log.info("llm.ok", provider=provider.name, schema=schema.__name__)
-                    return out
-        except (RetryError, Exception) as exc:  # noqa: BLE001
-            log.warning("llm.failed", provider=provider.name, error=str(exc))
-            last_exc = exc
-            continue
-    raise LLMUnavailable(f"no provider succeeded: {last_exc}")
+    with trace(
+        "llm.generate_json",
+        input={"prompt_chars": len(prompt), "schema": schema.__name__},
+        metadata={"providers": [p.name for p in providers]},
+    ) as t:
+        for provider in providers:
+            try:
+                async for attempt in AsyncRetrying(
+                    stop=stop_after_attempt(3),
+                    wait=wait_exponential(multiplier=0.5, min=0.5, max=4.0),
+                    retry=retry_if_exception_type(Exception),
+                    reraise=True,
+                ):
+                    with attempt:
+                        out = await provider.generate_json(prompt, schema)
+                        log.info("llm.ok", provider=provider.name, schema=schema.__name__)
+                        if t is not None:
+                            try:
+                                t.update(output=out.model_dump(mode="json"), metadata={"provider": provider.name})
+                            except Exception:  # noqa: BLE001
+                                pass
+                        return out
+            except (RetryError, Exception) as exc:  # noqa: BLE001
+                log.warning("llm.failed", provider=provider.name, error=str(exc))
+                last_exc = exc
+                continue
+        raise LLMUnavailable(f"no provider succeeded: {last_exc}")
 
 
 def render_for_log(payload: dict) -> str:
