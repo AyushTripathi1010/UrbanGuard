@@ -67,9 +67,19 @@ URBANGUARD_RL_SMOKE=1 uv run pytest services/rl/       # opt-in: 2K-step PPO tra
 make lint && make test                                 # CI also runs these
 ```
 
-## What's deliberately not here
+## Datasets
 
-- Real video datasets are not committed; `data/` is gitignored. Pull Nexar from Hugging Face, HWID12 from Kaggle, DoTA from GitHub. See `docs/architecture.md` for paths.
+The repo doesn't ship video data — `data/` is gitignored. Pull from the three sources via:
+
+```bash
+uv run python scripts/download_datasets.py nexar              # ~250 MB sample (default)
+uv run python scripts/download_datasets.py hwid12             # Kaggle, needs ~/.kaggle/kaggle.json
+uv run python scripts/download_datasets.py dota               # clones the repo; YouTube pulls are manual
+```
+
+Full datasets, contents, licenses, and the developer-perspective story of how each was discovered are in [`docs/datasets.md`](docs/datasets.md).
+
+## What's deliberately not here
 - The cloud bridge in `infra/lambda/` is a stub. The plan is "local-first, cloud-optional"; deploying needs an AWS account with billing.
 - `frontend/` ships only the essentials — alert feed + Leaflet heatmap. Polish (shadcn theme, RL policy bar chart, agent trace iframe) is a follow-up.
 
